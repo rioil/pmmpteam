@@ -1,10 +1,10 @@
 <?php
 
-namespace Team;
+namespace team;
 
 use pocketmine\plugin\PluginBase;
 
-class Team extends PluginBase{
+class team extends PluginBase{
 
         public function onLoad(){
                 $this->getLogger()->info("onLoad() has been called!");
