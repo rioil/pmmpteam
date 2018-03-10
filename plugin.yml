@@ -1,0 +1,5 @@
+#PMMPでマルチをするときのチーム分け用プラグイン
+name: Team Plugin
+main: Team/Team
+version: 0.0.1 
+pi: 3.0.0-ALPHA7
