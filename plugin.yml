@@ -7,11 +7,11 @@ api: 3.0.0-ALPHA11
 commands:
  tmake:
   description: "make team"
-  usage: " /tmake [Team] [Max] "
+  usage: " /tmake [TeamName] [MaxPlayerNumber] "
 
  tdelete:
   description: "delete team"
-  usage: " /tdelete [Team] "
+  usage: " /tdelete [TeamName] "
 
  jt:
   description: "join team"
