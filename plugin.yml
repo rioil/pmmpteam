@@ -1,47 +1,35 @@
 #PMMPでマルチをするときのチーム分け用プラグイン
 name: TeamPlugin
 main: team\team
-version: 0.0.1 
+version: 0.0.2
 api: 3.0.0-ALPHA11
 
 commands:
- tmake:
-  description: "make team"
-  usage: " /tmake [TeamName] [MaxPlayerNumber] "
+ team:
+  description: "team"
+  usage: " /team [操作] [チーム名] \n操作は make:作成 delete:削除"
 
- tdelete:
-  description: "delete team"
-  usage: " /tdelete [TeamName] "
-
- jt:
+ join:
   description: "join team"
-  usage: " /jt [Team] [Player] "
+  usage: " /join [チーム名]"
 
- lt:
+ leave:
   description: "leave team"
-  usage: " /lt [Player] "
-
+  usage: " /leave"
+ 
 permissions:
- jt:
-  default: true
-  description: "Allows joining all teams"
-  children:
-   jt.command:
-    default: true
-    description: "Allows joining all teams"
-
- lt:
-  default: true
-  description: "Allows leaving from all teams"
-  children:
-   jt.command:
-    default: true
-    description: "Allows leaving from all teams"
-
- teamop:
-  default: op
+ team:
+  default: OP
   description: "Allows making and deleting teams"
   children:
-   jt.command:
+   team.command:
     default: true
     description: "Allows making and deleting teams"
+
+ joinleave:
+  default: true
+  description: "Allows joining and leaving teams"
+  children:
+   jl.command:
+    default: true
+    description: "Allows joining and leaving teams"
