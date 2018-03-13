@@ -7,16 +7,13 @@ api: 3.0.0-ALPHA11
 commands:
  team:
   description: "team"
-  usage: " /team [操作] [チーム名] \n操作は make:作成 delete:削除"
-
+  
  join:
   description: "join team"
-  usage: " /join [チーム名]"
-
+  
  leave:
   description: "leave team"
-  usage: " /leave"
- 
+   
 permissions:
  team:
   default: OP
@@ -26,10 +23,18 @@ permissions:
     default: true
     description: "Allows making and deleting teams"
 
- joinleave:
+ join:
   default: true
-  description: "Allows joining and leaving teams"
+  description: "Allows joining teams"
   children:
-   jl.command:
+   join.command:
     default: true
-    description: "Allows joining and leaving teams"
+    description: "Allows joining teams"
+
+  leave:
+  default: true
+  description: "Allows leaving teams"
+  children:
+   leave.command:
+    default: true
+    description: "Allows leaving teams"

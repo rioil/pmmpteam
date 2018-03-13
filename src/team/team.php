@@ -35,83 +35,63 @@ class team extends PluginBase{
                                 if($sender->isOp()){
                                         
                                         //引数が空のとき
-                                        if(count($args) === 0){
+                                        if(count($args) === 1){
                                                 
-                                                $sender->sendMessage
-                                                ("《使用法》\n/team [操作][チーム名]\n操作は make(作成) delete(削除)");
-                                                return false;
+                                                $sender->sendMessage("《使用法》\n/team [操作][チーム名]\n操作は make(作成) delete(削除)");
+                                                break;
 
                                         }
+                                        else{
+                                                /* 
+                                                ここを実行すると処理はされるが
+                                                An unknown error occured while attempting to perform this command
+                                                というエラーが出る（2018/3/13）
+                                                原因は　$teamname =  strtolower($args[1]);　だと思われる
+                                                →f(count($args) === 0)となっていたのが原因　解決済み
+                                                */
+                                                $teamname = $args[0];                                              
+                                                switch ($args[0]){
 
-                                        switch ($args[0]){
+                                                        case "make" :
+                                                                $config = new Config($this->plugin->getDataFolder() . $teamname . ".yml", Config::YAML, array("thing" => "hello"));
+                                                                $config->get("thing"); //returns hello
+                                                                $sender->sendMessage("チーム" . $teamname . "を作成しました");
+                                                        break 2;
 
-                                                case "make" :
-                                                        $sender->sendMessage("チーム" . $args[1] . "を作成しました");
-                                                break;
+                                                        case "delete" :
+                                                                $sender->sendMessage("チーム" . $teamname . "を削除しました");
+                                                        break 2;
 
-                                                case "delete" :
-                                                        $sender->sendMessage("チーム" . $args[1] . "を削除しました");
-                                                break;
+                                                        default : 
+                                                                $sender->sendMessage("存在しない操作です");
+                                                        break 2;
 
+                                                }
                                         }
 
                                 }
-
                                 else{
                                         //エラーメッセージの送信
                                         $sender->sendMessage("このコマンドはOP権限が必要です");
+                                        break;
                                 }
-
+                        
                         break;
 
-                        case "join" :
-                                
+                        case "join" : 
                                 //joinの処理
+                                $sender->sendMessage("チーム" . $args[1] . "に参加しました");
+                                return true;
                         break;
 
                         case "leave" :
-
                                 //leaveの処理
+                                $sender->sendMessage("チーム" . $args[1] . "から抜けました");
+                                return true;
                         break;                     
                 
                 }
-
-                //一旦コメント化
-                /*
-                //引数が空のとき
-                if(count($args) === 0)
-                {
-                $sender->sendMessage("Usage:  /tmeke [TeamName]");
-                return false;
-                }
-                
-                //OPが実行したとき
-                if($sender->isOp()){
-                
-                $username = strtolower($args[0]);
-                $player = $sender->getServer()->getPlayer($username);
-                
-                        if($player instanceOf Player)
-                        {
-                        //$playerip = $player->getAddress();
-                        //$sender->sendMessage("".$player->getPlayer()->getName()." is IP:".$playerip."");
-                        //return true;
-                        }
-                        
-                        else
-                        {
-                        //$sender->sendMessage("".$username." doesn't exist");
-                        //return true;
-                        }
-                
-                //OP以外が実行したとき
-                }
-                
-                else
-                {
-                $sender->sendMessage("You don't have permission.");
                 return true;
-                }
-                */
+
         }
 }
