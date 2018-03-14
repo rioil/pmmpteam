@@ -6,13 +6,13 @@ api: 3.0.0-ALPHA11
 
 commands:
  team:
-  description: "team"
+  description: "チームを新たに作ったり削除したりします"
   
  join:
-  description: "join team"
+  description: "チームに参加します"
   
  leave:
-  description: "leave team"
+  description: "チームから抜けます"
    
 permissions:
  team:
