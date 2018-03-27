@@ -1,3 +1,5 @@
 teamlist.yml
 .vscode/launch.json
 players/*
+teams/*
+.vscode/settings.json

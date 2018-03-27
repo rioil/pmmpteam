@@ -11,7 +11,9 @@ use pocketmine\command\CommandExecutor;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 
-class TeamCommand implements CommandExecutor{
+//いずれ分離するとき用
+
+class TeamCommand extends Command implements PluginIdentifiableCommand{
 
     public function __construct(Loader $plugin) {
         $this->plugin = $plugin;
@@ -33,16 +35,21 @@ class TeamCommand implements CommandExecutor{
                     }
 
                     else{
-                       
+
+                        //２つ目の引数を取得し場合分け
                         $teamname = $args[1];
+                        $team_file = $this->getDataFolder() . "/teams/" . $teamaname . ".yml";
                         
                         switch ($args[0]){
 
                             case "make" :
 
-                                if(!$this->teamlist->file_exists($teamname)){ //入力されたチームが存在しないことを確認 エラーが出る
+                                //入力されたチームが存在しないことを確認
+                                if(!$this->teamlist->file_exists($team_file)){ 
+                                    new Config($team_file, Config::YAML);
                                     $sender->sendMessage("チーム：" . $teamname . "を作成しました");
                                 }
+                                //存在すれば
                                 else{
                                     $sender->sendMessage("チーム：" . $teamname . "はすでに存在しています");
                                 }
@@ -51,9 +58,12 @@ class TeamCommand implements CommandExecutor{
 
                             case "delete" :
 
-                                if($this->teamlist->config->exists($teamname)){ //入力されたチームが存在することを確認
+                                //入力されたチームが存在することを確認
+                                if($this->teamlist->config->exists($team_file)){
+                                    @rm($team_file);
                                     $sender->sendMessage("チーム：" . $teamname . "を削除しました");
                                 }
+                                //存在しなければ
                                 else{
                                     $sender->sendMessage("チーム：" . $teamname . "は存在しません");
                                 }
@@ -77,6 +87,7 @@ class TeamCommand implements CommandExecutor{
 
         case "join" : 
                 //joinの処理　例外処理が必要
+
                 $sender->sendMessage("チーム" . $args[0] . "に参加しました");
                 return true;
         break;
@@ -90,4 +101,5 @@ class TeamCommand implements CommandExecutor{
         }
         return true;
     }
+
 }
