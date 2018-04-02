@@ -8,8 +8,8 @@ use pocketmine\plugin\Plugin;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Server;
-use pocketmine\utils\Config;
 use pocketmine\utils\Utils;
+use pocketmine\utils\Config;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 
@@ -17,6 +17,8 @@ use pocketmine\event\player\PlayerJoinEvent;
 //use team\command\TeamCommand;
 
 class team extends PluginBase implements Listener{
+
+    public $teamlist;
 
   //plugin読み込み時に実行
     public function onLoad(){
@@ -27,9 +29,8 @@ class team extends PluginBase implements Listener{
         if(!file_exists($this->getDataFolder() . "players")){
             @mkdir($this->getDataFolder() . "players");
         }
-        if(!file_exists($this->getDataFolder() . "teams")){
-            @mkdir($this->getDataFolder() . "teams");
-        }
+        //チームのリストを作成
+        $this->teamlist = new Config($this->getDataFolder() . "teamlist.yml", Config::YAML);
         $this->getLogger()->info("初期化完了");
     }
     //pluginが有効になった時に実行
@@ -45,8 +46,7 @@ class team extends PluginBase implements Listener{
     //プレイヤーが入ったらconfigの生成
     public function onPlayerJoin(PlayerJoinEvent $event){
         $player = $event->getPlayer()->getName();
-        $this->getLogger()->info($player);
-        $new_player_config= new Config($this->getDataFolder() . "player/" . $player . ".yml", Config::YAML);
+        $new_player_config = new Config($this->getDataFolder() . "players/" . $player . ".yml", Config::YAML);
     }
 
     public function onCommand(CommandSender $sender, Command $command, $label, array $args) : bool {
@@ -68,9 +68,14 @@ class team extends PluginBase implements Listener{
 
                     if(isset($args[1])){
                         $teamname = $args[1];
-                        $team_file = ($this->getDataFolder() . "teams/" . $teamname . ".yml");
                         $arg1_correct = true;
-                        $team_exists = file_exists($team_file);
+                        //teamlistファイルにチーム名があるか確認
+                        if ($this->teamlist->exists($teamname)){
+                            $team_exists = true;
+                        }
+                        else{
+                            $team_exists = false;
+                        }
                     }
                     else{
                         $team_exists = false;
@@ -84,7 +89,8 @@ class team extends PluginBase implements Listener{
         
                         //引数・既存のチームのチェックをする
                         if(!$team_exists && $arg1_correct){ 
-                            new Config($team_file, Config::YAML);
+                            $this->teamlist->set($teamname,"0");
+                            $this->teamlist->save();
                             $sender->sendMessage("チーム：" . $teamname . "を作成しました");
                         }
                         //引数エラーの場合
@@ -103,12 +109,13 @@ class team extends PluginBase implements Listener{
         
                         //入力されたチームが存在することを確認
                         if($team_exists){
-                        @rmdir($team_file);
-                        $sender->sendMessage("チーム：" . $teamname . "を削除しました");
+                            $this->teamlist->remove($teamname);
+                            $this->teamlist->save();
+                            $sender->sendMessage("チーム：" . $teamname . "を削除しました");
                         }
                         //存在しなければ
                         elseif($arg1_correct){
-                        $sender->sendMessage("チーム：" . $teamname . "は存在しません");
+                            $sender->sendMessage("チーム：" . $teamname . "は存在しません");
                         }
                         else{
                             $sender->sendMessage("チーム名を正しく指定してください");
@@ -135,15 +142,16 @@ class team extends PluginBase implements Listener{
             case "join" :
             case "leave" :
 
-                //join,leave用の引数判定
+                //join,leave用の引数判定　＊TODO！チームに入っているかどうかも考慮して場合分け＊
                 if(isset($args[0])){
                     $teamname = $args[0];
-                    $team_file = ($this->getDataFolder() . "teams/" . $teamname . ".yml");
                         //チームが存在しないとき
-                        if(!file_exists($team_file)){
+                        if(!$this->teamlist->exists($teamname)){
                             $sender->sendMessage("チーム：" . $teamname . "は存在しません");
                             break;
                         }
+                        $this->send_player = $sender->getName();
+                        $this->current_player = new Config($this->getDataFolder() . "players/" . $this->send_player . ".yml", Config::YAML); 
                 }
                 else{
                     $sender->sendMessage("チーム名を正しく指定してください");
@@ -155,16 +163,20 @@ class team extends PluginBase implements Listener{
                     /*ここから下は入力されたチームが存在するときのみ実行されるので判定不要*/
 
                     case "join" :
-                        $teamname = "join";
-                        $sender->sendMessage("チーム" . $teamname . "に参加しました");            
+                        $this->current_player->set("team",$teamname);
+                        $this->current_player->save();
+                        $sender->sendMessage("チーム" . $teamname . "に参加しました");
+                        $this->getLogger()->info($this->send_player . "がチーム" . $teamname . "に参加しました");          
                     break 2;
                 
                     case "leave" : 
-                        $teamname = "leave";
+                        $this->current_player->remove("team",$teamname);
+                        $this->current_player->save();
                         $sender->sendMessage("チーム" . $teamname . "から抜けました");
+                        $this->getLogger()->info($this->send_player . "がチーム" . $teamname . "から抜けました");          
                     break 2;       
                 
-                }
+               }
 
             break;
         }
