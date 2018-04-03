@@ -5,8 +5,11 @@ version: 0.0.3
 api: 3.0.0-ALPHA11
 
 commands:
- team:
+ teamop:
   description: "チームを新たに作ったり削除したりします"
+
+ team:
+  description: "チームに関する情報を確認できます"
   
  join:
   description: "チームに参加します"
