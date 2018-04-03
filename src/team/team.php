@@ -66,7 +66,7 @@ class team extends PluginBase implements Listener{
                         
                     //引数が空のとき
                     if(!isset($args[0])){
-                        $sender->sendMessage('《使用法》\n/team [操作][チーム名]\n操作は make(作成) delete(削除)');
+                        $sender->sendMessage("《使用法》\n/team [操作][チーム名]\n操作は make(作成) delete(削除)");
                         break;
                     }
             
@@ -131,7 +131,7 @@ class team extends PluginBase implements Listener{
                             break 2;
                 
                             default : 
-                                $sender->sendMessage('存在しない操作です\n/teamopで使い方を確認できます');
+                                $sender->sendMessage("存在しない操作です\n/teamopで使い方を確認できます");
                             break 2;
                         }                        
                     }
@@ -148,7 +148,7 @@ class team extends PluginBase implements Listener{
             case 'team':
                 //引数が空のとき
                 if(!isset($args[0])){
-                    $sender->sendMessage('《使用法》\n/team [info : チーム一覧の表示]');
+                    $sender->sendMessage("《使用法》\n/team [info : チーム一覧の表示]");
                     break;
                 }
                 else{
@@ -164,7 +164,7 @@ class team extends PluginBase implements Listener{
                         break 2;
 
                         default : 
-                            $sender->sendMessage('存在しない操作です\n/teamで使い方を確認できます');
+                            $sender->sendMessage("存在しない操作です\n/teamで使い方を確認できます");
                         break 2;
                     }
                 }
