@@ -67,10 +67,10 @@ class team extends PluginBase implements Listener{
                 else{
 
                     if(isset($args[1])){
-                        $teamname = $args[1];
+                        $this->teamname = $args[1];
                         $arg1_correct = true;
                         //teamlistファイルにチーム名があるか確認
-                        if ($this->teamlist->exists($teamname)){
+                        if ($this->teamlist->exists($this->teamname)){
                             $team_exists = true;
                         }
                         else{
@@ -89,13 +89,13 @@ class team extends PluginBase implements Listener{
         
                         //引数・既存のチームのチェックをする
                         if(!$team_exists && $arg1_correct){ 
-                            $this->teamlist->set($teamname,"0");
+                            $this->teamlist->set($this->teamname,"0");
                             $this->teamlist->save();
-                            $sender->sendMessage("チーム：" . $teamname . "を作成しました");
+                            $sender->sendMessage("チーム：" . $this->teamname . "を作成しました");
                         }
                         //引数エラーの場合
                         elseif($arg1_correct){
-                            $sender->sendMessage("チーム：" . $teamname . "はすでに存在します");
+                            $sender->sendMessage("チーム：" . $this->teamname . "はすでに存在します");
                         }
                         else{
                             $sender->sendMessage("チーム名を正しく指定してください");
@@ -109,13 +109,13 @@ class team extends PluginBase implements Listener{
         
                         //入力されたチームが存在することを確認
                         if($team_exists){
-                            $this->teamlist->remove($teamname);
+                            $this->teamlist->remove($this->teamname);
                             $this->teamlist->save();
-                            $sender->sendMessage("チーム：" . $teamname . "を削除しました");
+                            $sender->sendMessage("チーム：" . $this->teamname . "を削除しました");
                         }
                         //存在しなければ
                         elseif($arg1_correct){
-                            $sender->sendMessage("チーム：" . $teamname . "は存在しません");
+                            $sender->sendMessage("チーム：" . $this->teamname . "は存在しません");
                         }
                         else{
                             $sender->sendMessage("チーム名を正しく指定してください");
@@ -140,17 +140,16 @@ class team extends PluginBase implements Listener{
             break;
 
             case "join" :
-            case "leave" :
 
-                //join,leave用の引数判定　＊TODO！チームに入っているかどうかも考慮して場合分け＊
                 if(isset($args[0])){
-                    $teamname = $args[0];
+                    $this->teamname = $args[0];
                         //チームが存在しないとき
-                        if(!$this->teamlist->exists($teamname)){
-                            $sender->sendMessage("チーム：" . $teamname . "は存在しません");
+                        if(!$this->teamlist->exists($this->teamname)){
+                            $sender->sendMessage("チーム：" . $this->teamname . "は存在しません");
                             break;
                         }
                         $this->send_player = $sender->getName();
+                        //プレイヤーのコンフィグ準備
                         $this->current_player = new Config($this->getDataFolder() . "players/" . $this->send_player . ".yml", Config::YAML); 
                 }
                 else{
@@ -158,27 +157,33 @@ class team extends PluginBase implements Listener{
                     break ;
                 }
 
-                switch (strtolower($command->getName())){
-                
-                    /*ここから下は入力されたチームが存在するときのみ実行されるので判定不要*/
-
-                    case "join" :
-                        $this->current_player->set("team",$teamname);
-                        $this->current_player->save();
-                        $sender->sendMessage("チーム" . $teamname . "に参加しました");
-                        $this->getLogger()->info($this->send_player . "がチーム" . $teamname . "に参加しました");          
-                    break 2;
-                
-                    case "leave" : 
-                        $this->current_player->remove("team",$teamname);
-                        $this->current_player->save();
-                        $sender->sendMessage("チーム" . $teamname . "から抜けました");
-                        $this->getLogger()->info($this->send_player . "がチーム" . $teamname . "から抜けました");          
-                    break 2;       
-                
-               }
+                //コンフィグにチーム名をセット・完了メッセージ
+                $this->current_player->set("team",$this->teamname);
+                $this->current_player->save();
+                $sender->sendMessage("チーム" . $this->teamname . "に参加しました");
+                $this->getLogger()->info($this->send_player . "がチーム" . $this->teamname . "に参加しました");
 
             break;
+
+            case "leave" :
+
+                $this->send_player = $sender->getName();
+                //プレイヤーのコンフィグ準備
+                $this->current_player = new Config($this->getDataFolder() . "players/" . $this->send_player . ".yml", Config::YAML); 
+                if($this->current_player->exists("team")){
+                    $this->current_team = $this->current_player->get("team");
+                    $this->current_player->remove("team",$this->teamname);
+                    $this->current_player->save();
+                    //完了メッセージ
+                    $sender->sendMessage("チーム" . $this->current_team . "から抜けました");
+                    $this->getLogger()->info($this->send_player . "がチーム" . $this->current_team . "から抜けました");
+                }
+                else{
+                    $sender->sendMessage("現在どのチームにも属していません");
+                }
+
+            break;
+
         }
 
         return true;
